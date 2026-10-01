@@ -1,0 +1,10 @@
+[
+  {"text": "Baker 12, disturbance, 27th and Vine, the Kwik Shop, two males fighting in the parking lot, time is 2314.", "expect_mappable": true, "expect_agency": "police"},
+  {"text": "Engine 5, Medic 3, respond to 4800 South 48th Street for a 62 year old male, chest pains, conscious and breathing.", "expect_mappable": true, "expect_agency": "fire"},
+  {"text": "Ten-four, en route.", "expect_mappable": false},
+  {"text": "Lancaster County 14, injury accident, Highway 2 and 84th, two vehicles, one blocking the eastbound lane.", "expect_mappable": true, "expect_agency": "sheriff"},
+  {"text": "Any unit for a welfare check at the Casey's on Cornhusker Highway, caller says a male has been sleeping in his car for three hours.", "expect_mappable": true},
+  {"text": "Truck 8, Battalion 1, structure fire, 1621 North 33rd Street, smoke showing from the second floor.", "expect_mappable": true, "expect_agency": "fire"},
+  {"text": "Charlie 4, I'll be out on a traffic stop, Capitol Parkway and 17th, white Chevy Silverado.", "expect_mappable": true, "expect_agency": "police"},
+  {"text": "David 22, copy, ten-ninety-seven.", "expect_mappable": false}
+]

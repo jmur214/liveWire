@@ -1,0 +1,8 @@
+numpy>=1.26
+requests>=2.31
+faster-whisper>=1.0
+anthropic>=0.40
+fastapi>=0.110
+uvicorn[standard]>=0.29
+# Silero VAD (optional but strongly recommended; without it an energy gate is used)
+torch>=2.2

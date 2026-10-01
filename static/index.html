@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lincoln Scanner Map</title>
+<link rel="stylesheet" href="/static/leaflet.css">
+<script src="/static/leaflet.js"></script>
+<style>
+  :root { --bg:#0f1115; --panel:#171a21; --text:#e6e8ee; --muted:#8a90a3; --line:#262a35;
+          --police:#4f8ef7; --fire:#f05d4f; --sheriff:#d8a93c; --unknown:#8a90a3; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--text);
+              font:14px/1.4 -apple-system,system-ui,Segoe UI,Roboto,sans-serif; }
+  #app { display:grid; grid-template-columns:1fr 380px; height:100%; }
+  #map { height:100%; background:#0f1115; }
+  #side { background:var(--panel); border-left:1px solid var(--line); display:flex; flex-direction:column; min-width:0; }
+  header { padding:12px 14px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px; }
+  header h1 { font-size:15px; margin:0; font-weight:600; flex:1; }
+  header select { background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:4px 6px; }
+  #status { font-size:12px; color:var(--muted); padding:6px 14px; border-bottom:1px solid var(--line); }
+  #feed { overflow-y:auto; flex:1; }
+  .tx { padding:10px 14px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .tx:hover { background:#1d2130; }
+  .tx .meta { font-size:11px; color:var(--muted); display:flex; gap:8px; align-items:center; margin-bottom:3px; }
+  .tx .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .tx .summary { font-weight:500; }
+  .tx .text { color:var(--muted); font-size:12px; margin-top:3px; }
+  .tx audio { width:100%; height:28px; margin-top:6px; }
+  .pin { width:14px; height:14px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 3px rgba(0,0,0,.35); }
+  .leaflet-popup-content-wrapper { background:var(--panel); color:var(--text); border-radius:8px; }
+  .leaflet-popup-tip { background:var(--panel); }
+  .leaflet-popup-content { margin:10px 12px; font-size:13px; }
+  @media (max-width:800px) { #app { grid-template-columns:1fr; grid-template-rows:55% 45%; } #side { border-left:0; border-top:1px solid var(--line);} }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map"></div>
+  <aside id="side">
+    <header>
+      <h1>Lincoln Scanner Map</h1>
+      <select id="hours">
+        <option value="0.5">30 min</option>
+        <option value="1">1 h</option>
+        <option value="2" selected>2 h</option>
+        <option value="6">6 h</option>
+        <option value="24">24 h</option>
+      </select>
+    </header>
+    <div id="status">connecting…</div>
+    <div id="feed"></div>
+  </aside>
+</div>
+<script>
+const COLORS = { police:'#4f8ef7', fire:'#f05d4f', sheriff:'#d8a93c', unknown:'#8a90a3' };
+const map = L.map('map', { zoomControl:true }).setView([40.8136, -96.7026], 12);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution:'&copy; OpenStreetMap &copy; CARTO', maxZoom:19 }).addTo(map);
+
+const markers = new Map();   // id -> marker
+const layer = L.layerGroup().addTo(map);
+
+function ago(ts) {
+  const s = Math.max(0, Date.now()/1000 - ts);
+  if (s < 60) return `${Math.round(s)}s ago`;
+  if (s < 3600) return `${Math.round(s/60)}m ago`;
+  return `${(s/3600).toFixed(1)}h ago`;
+}
+function clock(ts) { return new Date(ts*1000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+function esc(s) { return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function popupHtml(e) {
+  const delayed = e.agency === 'police' ? ' <span style="color:#8a90a3">(delayed feed)</span>' : '';
+  return `<div><b>${esc(e.summary || e.incident_type || 'transmission')}</b><br>
+    <span style="color:#8a90a3">${esc(e.location_text||'')} · ${clock(e.occurred_at)}${delayed}</span><br>
+    <span style="font-size:12px">${esc(e.transcript)}</span><br>
+    ${e.units && e.units.length ? '<span style="font-size:11px;color:#8a90a3">'+esc(e.units.join(', '))+'</span><br>' : ''}
+    <audio controls preload="none" src="/audio/${e.audio_file}" style="width:100%;height:28px;margin-top:6px"></audio></div>`;
+}
+
+function render(events, hours) {
+  const seen = new Set();
+  const now = Date.now()/1000;
+  for (const e of events) {
+    seen.add(e.id);
+    const age = (now - e.occurred_at) / (hours*3600);          // 0 = fresh, 1 = about to expire
+    const color = COLORS[e.agency] || COLORS.unknown;
+    const opacity = Math.max(0.25, 1 - age);
+    if (markers.has(e.id)) { markers.get(e.id).setOpacity(opacity); continue; }
+    const icon = L.divIcon({ className:'', html:`<div class="pin" style="background:${color}"></div>`, iconSize:[14,14], iconAnchor:[7,7] });
+    const m = L.marker([e.lat, e.lon], { icon, opacity }).bindPopup(popupHtml(e)).addTo(layer);
+    markers.set(e.id, m);
+  }
+  for (const [id, m] of markers) if (!seen.has(id)) { layer.removeLayer(m); markers.delete(id); }
+}
+
+function renderFeed(events) {
+  const feed = document.getElementById('feed');
+  feed.innerHTML = events.map(e => `
+    <div class="tx" data-id="${e.id}" data-lat="${e.lat??''}" data-lon="${e.lon??''}">
+      <div class="meta"><span class="dot" style="background:${COLORS[e.agency]||COLORS.unknown}"></span>
+        ${clock(e.occurred_at)} · ${ago(e.occurred_at)}${e.lat ? ' · 📍' : ''}</div>
+      ${e.summary ? `<div class="summary">${esc(e.summary)}</div>` : ''}
+      <div class="text">${esc(e.transcript)}</div>
+      <audio controls preload="none" src="/audio/${e.audio_file}"></audio>
+    </div>`).join('');
+  feed.querySelectorAll('.tx').forEach(el => el.addEventListener('click', ev => {
+    if (ev.target.tagName === 'AUDIO') return;
+    const id = +el.dataset.id;
+    if (markers.has(id)) { map.flyTo(markers.get(id).getLatLng(), 15); markers.get(id).openPopup(); }
+  }));
+}
+
+async function refresh() {
+  const hours = +document.getElementById('hours').value;
+  try {
+    const [m, t] = await Promise.all([
+      fetch(`/api/events?hours=${hours}`).then(r => r.json()),
+      fetch(`/api/transcript?hours=${hours}`).then(r => r.json()),
+    ]);
+    render(m.events, hours);
+    renderFeed(t.events);
+    document.getElementById('status').textContent =
+      `${m.events.length} mapped · ${t.events.length} transmissions · updated ${new Date().toLocaleTimeString()}`;
+  } catch (e) {
+    document.getElementById('status').textContent = 'backend unreachable';
+  }
+}
+document.getElementById('hours').addEventListener('change', () => { markers.forEach(m => layer.removeLayer(m)); markers.clear(); refresh(); });
+refresh();
+setInterval(refresh, 10000);
+</script>
+</body>
+</html>
