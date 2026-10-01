@@ -5,7 +5,7 @@ further input. Part A is what to build. Part B is how to build it: codebase
 state, schemas, API contracts, project setup, dev mode, acceptance criteria,
 and build order. Follow the build order in §B.9 exactly.
 
-Working name: `ScannerMap` (user will rename). Platform: iOS 17+, SwiftUI +
+App name: **LiveWire**. Platform: iOS 17+, SwiftUI +
 MapKit. Server: Python 3.11+, FastAPI, SQLite, hosted on a small Linux VPS.
 Single user; no accounts.
 
@@ -361,13 +361,13 @@ Target: Ubuntu 24.04, 1–2 vCPU, 2 GB RAM (Hetzner CX22 or equivalent).
 Provide `deploy/`:
 
 - `install.sh`: apt `ffmpeg python3-venv caddy espeak-ng`; create
-  `/opt/scannermap`; venv; `pip install -r requirements.txt` (drop `torch`
+  `/opt/livewire`; venv; `pip install -r requirements.txt` (drop `torch`
   and `faster-whisper` from the default requirements; move them to
   `requirements-local-whisper.txt`; Silero VAD without torch is not possible,
   so ingest's energy-gate fallback becomes the default on the VPS, tuned:
   threshold 0.015, and add a 300 ms hangover).
-- `scannermap-ingest.service` and `scannermap-api.service` (systemd, `Restart=always`,
-  `EnvironmentFile=/opt/scannermap/.env`).
+- `livewire-ingest.service` and `livewire-api.service` (systemd, `Restart=always`,
+  `EnvironmentFile=/opt/livewire/.env`).
 - `Caddyfile`: `scanner.example.com { reverse_proxy 127.0.0.1:8000 }` —
   Caddy obtains the TLS cert. iOS ATS requires HTTPS; do not add an ATS
   exception.
@@ -442,7 +442,7 @@ POST /api/report           {"incident_id": 123, "reason": "wrong_location"}
 ## B4. iOS project
 
 - Xcode 16+, iOS 17.0 deployment target, Swift 5.10, SwiftUI lifecycle.
-- Bundle ID `com.<user>.scannermap` (placeholder; the user sets it). Team:
+- Bundle ID `com.<user>.livewire` (placeholder; the user sets it). Team:
   the user's. Create the project with `xcodegen` from a `project.yml` in
   `ios/` so the project file is reproducible; commit `project.yml`, not the
   `.xcodeproj`.
@@ -459,26 +459,26 @@ File layout:
 
 ```
 ios/project.yml
-ios/ScannerMap/App/ScannerMapApp.swift          @main; AppDelegate for APNs token
-ios/ScannerMap/App/AppModel.swift               @Observable root state: incidents, transmissions,
+ios/LiveWire/App/LiveWireApp.swift          @main; AppDelegate for APNs token
+ios/LiveWire/App/AppModel.swift               @Observable root state: incidents, transmissions,
                                                 filters, settings, unread count, selection
-ios/ScannerMap/Services/APIClient.swift         async/await; bearer token; decoders for B3
-ios/ScannerMap/Services/StreamClient.swift      SSE reader with polling fallback
-ios/ScannerMap/Services/AudioEngine.swift       queue + AVPlayer; session config; Now Playing; cache
-ios/ScannerMap/Services/LocationService.swift   CLLocationManager wrapper; distance helpers
-ios/ScannerMap/Services/PushRegistrar.swift     permission, token, POST /api/device
-ios/ScannerMap/Services/Settings.swift          @AppStorage-backed; Keychain for API token
-ios/ScannerMap/Models/*.swift                   Incident, Transmission, City, AlertRules (Codable)
-ios/ScannerMap/Views/HomeView.swift             map + overlays
-ios/ScannerMap/Views/Components/AgencyChips.swift, LatestBanner.swift, PillPlayer.swift,
+ios/LiveWire/Services/APIClient.swift         async/await; bearer token; decoders for B3
+ios/LiveWire/Services/StreamClient.swift      SSE reader with polling fallback
+ios/LiveWire/Services/AudioEngine.swift       queue + AVPlayer; session config; Now Playing; cache
+ios/LiveWire/Services/LocationService.swift   CLLocationManager wrapper; distance helpers
+ios/LiveWire/Services/PushRegistrar.swift     permission, token, POST /api/device
+ios/LiveWire/Services/Settings.swift          @AppStorage-backed; Keychain for API token
+ios/LiveWire/Models/*.swift                   Incident, Transmission, City, AlertRules (Codable)
+ios/LiveWire/Views/HomeView.swift             map + overlays
+ios/LiveWire/Views/Components/AgencyChips.swift, LatestBanner.swift, PillPlayer.swift,
                                                 IncidentPin.swift, RightRail.swift
-ios/ScannerMap/Views/IncidentCard.swift         compact card
-ios/ScannerMap/Views/FeedSheet.swift
-ios/ScannerMap/Views/IncidentDetailView.swift
-ios/ScannerMap/Views/SettingsView.swift, AlertsView.swift, PlaceEditor.swift
-ios/ScannerMap/Theme/Theme.swift                colours, radii, agency palette
-ios/ScannerMap/Preview/Fixtures.swift           sample Incident/Transmission for previews
-ios/ScannerMapTests/                            grouping-free unit tests: decoders, distance,
+ios/LiveWire/Views/IncidentCard.swift         compact card
+ios/LiveWire/Views/FeedSheet.swift
+ios/LiveWire/Views/IncidentDetailView.swift
+ios/LiveWire/Views/SettingsView.swift, AlertsView.swift, PlaceEditor.swift
+ios/LiveWire/Theme/Theme.swift                colours, radii, agency palette
+ios/LiveWire/Preview/Fixtures.swift           sample Incident/Transmission for previews
+ios/LiveWireTests/                            grouping-free unit tests: decoders, distance,
                                                 feed merge logic, queue behaviour
 ```
 

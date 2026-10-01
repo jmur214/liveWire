@@ -1,4 +1,4 @@
-# scannermap — Lincoln, NE police/fire radio on a live map
+# LiveWire — Lincoln, NE police/fire radio on a live map
 
 Listens to the public safety audio feed, transcribes each transmission, pulls
 the location out with an LLM, geocodes it, and plots it on a map with the

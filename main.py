@@ -23,7 +23,7 @@ from geocode import geocode
 from ingest import transmissions
 from transcribe import transcribe
 
-log = logging.getLogger("scannermap")
+log = logging.getLogger("livewire")
 
 
 def _save_clip(audio: np.ndarray, heard_at: float) -> str:

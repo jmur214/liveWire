@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 import config
 import db
 
-app = FastAPI(title="scannermap")
+app = FastAPI(title="livewire")
 db.init()
 
 

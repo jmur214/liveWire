@@ -38,7 +38,7 @@ MIN_TRANSCRIPT_CHARS = 20
 LINCOLN_BBOX = (-96.85, 40.65, -96.50, 40.95)
 GEOCODER = os.environ.get("GEOCODER", "nominatim")   # nominatim | mapbox
 MAPBOX_TOKEN = os.environ.get("MAPBOX_TOKEN", "")
-NOMINATIM_USER_AGENT = "scannermap-lincoln (personal project)"
+NOMINATIM_USER_AGENT = "livewire-lincoln (personal project)"
 NOMINATIM_MIN_INTERVAL = 1.1   # their usage policy: max 1 req/sec
 
 # --- Delay handling ---------------------------------------------------------
