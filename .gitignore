@@ -1,0 +1,15 @@
+# secrets / keys
+.env
+*.p8
+# runtime data
+data/
+# python
+.venv/
+__pycache__/
+*.pyc
+# xcode (project is generated from ios/project.yml with xcodegen)
+ios/*.xcodeproj
+ios/*.xcworkspace
+ios/DerivedData/
+xcuserdata/
+.DS_Store

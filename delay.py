@@ -11,12 +11,9 @@ import logging
 import re
 from collections import deque
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
-
 import config
 
 log = logging.getLogger(__name__)
-TZ = ZoneInfo("America/Chicago")
 
 # "23:14", "2314", "11:14 PM", "eleven fourteen" (whisper usually emits digits)
 _TIME = re.compile(r"\b(?:time is|at|time)\s*(\d{1,2})[:\s]?(\d{2})\s*(a\.?m\.?|p\.?m\.?|hours)?\b", re.I)
@@ -52,7 +49,7 @@ class DelayEstimator:
         except ValueError:
             return
 
-        heard = datetime.fromtimestamp(heard_at, TZ)
+        heard = datetime.fromtimestamp(heard_at, config.CITY_TZ)
         spoken = heard.replace(hour=h, minute=mm, second=0, microsecond=0)
         if spoken > heard:  # said "23:58", heard at 00:10 -> it was yesterday
             spoken -= timedelta(days=1)

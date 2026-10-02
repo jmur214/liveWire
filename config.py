@@ -1,6 +1,7 @@
 """Central configuration. Everything can be overridden with environment variables."""
 import os
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).parent
 DATA_DIR = ROOT / "data"
@@ -55,3 +56,4 @@ KEEP_AUDIO_HOURS = 24
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8000"))
 MAP_CENTER = (40.8136, -96.7026)     # downtown Lincoln
+CITY_TZ = ZoneInfo("America/Chicago")  # spoken clock times are local time

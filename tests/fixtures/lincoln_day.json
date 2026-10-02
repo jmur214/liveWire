@@ -1,0 +1,1096 @@
+[
+ {
+  "offset_sec": 0,
+  "agency": "fire",
+  "transcript": "Truck 8, Engine 1, Battalion 1, structure fire, 1621 North 33rd Street, caller reports smoke showing from the second floor.",
+  "incident_type": "structure fire",
+  "summary": "Structure fire, smoke showing from the second floor",
+  "location_text": "1621 North 33rd Street",
+  "geocode_query": "1621 N 33rd St, Lincoln, NE",
+  "location_kind": "address",
+  "lat": 40.8268,
+  "lon": -96.69,
+  "units": [
+   "Truck 8",
+   "Engine 1",
+   "Battalion 1"
+  ],
+  "confidence": 0.92,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 28,
+  "agency": "fire",
+  "transcript": "Truck 8 responding.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Truck 8"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 35,
+  "agency": "fire",
+  "transcript": "Engine 1 en route.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Engine 1"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 90,
+  "agency": "police",
+  "transcript": "Baker 12, Baker 14, disturbance, 27th and Vine, the Kwik Shop, two males fighting in the parking lot, time is {clock}.",
+  "incident_type": "disturbance",
+  "summary": "Two males fighting in the Kwik Shop parking lot",
+  "location_text": "27th and Vine, the Kwik Shop",
+  "geocode_query": "N 27th St & Vine St, Lincoln, NE",
+  "location_kind": "intersection",
+  "lat": 40.8208,
+  "lon": -96.6868,
+  "units": [
+   "Baker 12",
+   "Baker 14"
+  ],
+  "confidence": 0.85,
+  "spoken_time": "heard-840"
+ },
+ {
+  "offset_sec": 118,
+  "agency": "police",
+  "transcript": "Baker 12 copy, en route from 10th and O.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Baker 12"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 125,
+  "agency": "police",
+  "transcript": "Baker 14, ten-seventy-six.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Baker 14"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 150,
+  "agency": "police",
+  "transcript": "Lincoln, radio check.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 155,
+  "agency": "police",
+  "transcript": "Loud and clear.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 210,
+  "agency": "fire",
+  "transcript": "Truck 8 on scene, two story residential, smoke showing side alpha, establishing 33rd Street command.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Truck 8"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 300,
+  "agency": "sheriff",
+  "transcript": "Lancaster 14, Lancaster 22, injury accident, Highway 2 and 84th Street, two vehicles, one blocking the eastbound lane, fire has been notified.",
+  "incident_type": "injury accident",
+  "summary": "Two-vehicle injury accident blocking the eastbound lane",
+  "location_text": "Highway 2 and 84th Street",
+  "geocode_query": "Nebraska Highway 2 & S 84th St, Lincoln, NE",
+  "location_kind": "intersection",
+  "lat": 40.7512,
+  "lon": -96.6067,
+  "units": [
+   "Lancaster 14",
+   "Lancaster 22"
+  ],
+  "confidence": 0.88,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 315,
+  "agency": "fire",
+  "transcript": "Medic 1, Engine 7, injury accident, Highway 2 and 84th, two vehicles, one with injuries.",
+  "incident_type": "injury accident",
+  "summary": "Injury accident, one patient",
+  "location_text": "Highway 2 and 84th",
+  "geocode_query": "Nebraska Highway 2 & S 84th St, Lincoln, NE",
+  "location_kind": "intersection",
+  "lat": 40.7512,
+  "lon": -96.6067,
+  "units": [
+   "Medic 1",
+   "Engine 7"
+  ],
+  "confidence": 0.86,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 330,
+  "agency": "sheriff",
+  "transcript": "Lancaster 14, en route.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Lancaster 14"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 345,
+  "agency": "fire",
+  "transcript": "Medic 1 responding.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Medic 1"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 380,
+  "agency": "police",
+  "transcript": "Baker 12, ten-ninety-seven, I've got the two parties separated.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Baker 12"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 420,
+  "agency": "fire",
+  "transcript": "Battalion 1 to dispatch, 1621 North 33rd, we have fire through the roof, request a second alarm.",
+  "incident_type": "structure fire",
+  "summary": "Second alarm requested, fire through the roof",
+  "location_text": "1621 North 33rd",
+  "geocode_query": "1621 N 33rd St, Lincoln, NE",
+  "location_kind": "address",
+  "lat": 40.8268,
+  "lon": -96.69,
+  "units": [
+   "Battalion 1"
+  ],
+  "confidence": 0.9,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 445,
+  "agency": "fire",
+  "transcript": "Engine 2, Truck 1, respond on the second alarm, 1621 North 33rd Street.",
+  "incident_type": "structure fire",
+  "summary": "Second alarm companies dispatched",
+  "location_text": "1621 North 33rd Street",
+  "geocode_query": "1621 N 33rd St, Lincoln, NE",
+  "location_kind": "address",
+  "lat": 40.8268,
+  "lon": -96.69,
+  "units": [
+   "Engine 2",
+   "Truck 1"
+  ],
+  "confidence": 0.93,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 470,
+  "agency": "fire",
+  "transcript": "Engine 2 en route to the second alarm.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Engine 2"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 480,
+  "agency": "fire",
+  "transcript": "Engine 5, Medic 3, respond to 4800 South 48th Street for a 62 year old male, chest pains, conscious and breathing.",
+  "incident_type": "medical",
+  "summary": "62-year-old male with chest pains",
+  "location_text": "4800 South 48th Street",
+  "geocode_query": "4800 S 48th St, Lincoln, NE",
+  "location_kind": "address",
+  "lat": 40.776,
+  "lon": -96.6534,
+  "units": [
+   "Engine 5",
+   "Medic 3"
+  ],
+  "confidence": 0.9,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 505,
+  "agency": "fire",
+  "transcript": "Medic 3 responding.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Medic 3"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 512,
+  "agency": "fire",
+  "transcript": "Engine 5 en route.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Engine 5"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 690,
+  "agency": "sheriff",
+  "transcript": "Lancaster 22, on scene, we'll need a tow for both vehicles, traffic is getting by in the westbound lane.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Lancaster 22"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 710,
+  "agency": "fire",
+  "transcript": "Medic 1 arrived, one patient, we'll be contacting Bryan West.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Medic 1"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 720,
+  "agency": "police",
+  "transcript": "Charlie 4, I'll be out on a traffic stop, Capitol Parkway and 17th, white Chevy Silverado, Nebraska plate.",
+  "incident_type": "traffic stop",
+  "summary": "Traffic stop on a white Chevy Silverado",
+  "location_text": "Capitol Parkway and 17th",
+  "geocode_query": "Capitol Pkwy & S 17th St, Lincoln, NE",
+  "location_kind": "intersection",
+  "lat": 40.806,
+  "lon": -96.705,
+  "units": [
+   "Charlie 4"
+  ],
+  "confidence": 0.8,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 745,
+  "agency": "police",
+  "transcript": "Charlie 4, copy.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Charlie 4"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 760,
+  "agency": "fire",
+  "transcript": "Engine 5 on scene.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Engine 5"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 960,
+  "agency": "police",
+  "transcript": "Baker 12, clear, one party cited for disorderly, the other left on foot.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Baker 12"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1010,
+  "agency": "police",
+  "transcript": "Charlie 4, can I get a 28 on Nebraska plate Alpha Bravo Charlie one two three four.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Charlie 4"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1200,
+  "agency": "police",
+  "transcript": "Adam 20, Adam 22, shots fired, 22nd and Y Street, caller heard four to five shots, no suspect description.",
+  "incident_type": "shooting",
+  "summary": "Shots fired, four to five shots heard",
+  "location_text": "22nd and Y Street",
+  "geocode_query": "N 22nd St & Y St, Lincoln, NE",
+  "location_kind": "intersection",
+  "lat": 40.8206,
+  "lon": -96.6937,
+  "units": [
+   "Adam 20",
+   "Adam 22"
+  ],
+  "confidence": 0.78,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1215,
+  "agency": "police",
+  "transcript": "Adam 20 en route, code three.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Adam 20"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1222,
+  "agency": "police",
+  "transcript": "Adam 22, responding.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Adam 22"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1230,
+  "agency": "police",
+  "transcript": "Charlie 4, clear of the stop, citation issued.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Charlie 4"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1300,
+  "agency": "fire",
+  "transcript": "Medic 3 transporting one to Bryan East.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Medic 3"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1320,
+  "agency": "fire",
+  "transcript": "Engine 5 clear, available.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Engine 5"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1340,
+  "agency": "police",
+  "transcript": "Adam 20, I'm on scene, 23rd and Y, I've got one male victim, gunshot wound to the leg, start medics.",
+  "incident_type": "shooting",
+  "summary": "One male victim with a gunshot wound to the leg",
+  "location_text": "23rd and Y",
+  "geocode_query": "N 23rd St & Y St, Lincoln, NE",
+  "location_kind": "intersection",
+  "lat": 40.8206,
+  "lon": -96.6925,
+  "units": [
+   "Adam 20"
+  ],
+  "confidence": 0.8,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1370,
+  "agency": "fire",
+  "transcript": "Medic 1, Engine 6, assist LPD, 23rd and Y, gunshot victim, stage until police advise.",
+  "incident_type": "shooting",
+  "summary": "Medics staging for a gunshot victim",
+  "location_text": "23rd and Y",
+  "geocode_query": "N 23rd St & Y St, Lincoln, NE",
+  "location_kind": "intersection",
+  "lat": 40.8206,
+  "lon": -96.6925,
+  "units": [
+   "Medic 1",
+   "Engine 6"
+  ],
+  "confidence": 0.8,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1385,
+  "agency": "fire",
+  "transcript": "Medic 1 staged at 24th and Y.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Medic 1"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1420,
+  "agency": "police",
+  "transcript": "Adam 22 on scene, scene is secure, medics can come in.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Adam 22"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1500,
+  "agency": "fire",
+  "transcript": "Battalion 1, fire is knocked down, all companies clear except Truck 8, back in service.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Battalion 1"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1560,
+  "agency": "fire",
+  "transcript": "Engine 1 clear, available.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Engine 1"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1700,
+  "agency": "police",
+  "transcript": "Frank 10, I'll be 10-8 from the station.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Frank 10"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1800,
+  "agency": "fire",
+  "transcript": "Engine 3, Battalion 2, vehicle fire, Interstate 80 westbound just past the 27th Street exit, fully involved passenger car on the shoulder.",
+  "incident_type": "vehicle fire",
+  "summary": "Fully involved passenger car on the shoulder",
+  "location_text": "Interstate 80 westbound just past the 27th Street exit",
+  "geocode_query": "I-80 & N 27th St, Lincoln, NE",
+  "location_kind": "highway",
+  "lat": 40.8595,
+  "lon": -96.6875,
+  "units": [
+   "Engine 3",
+   "Battalion 2"
+  ],
+  "confidence": 0.7,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1830,
+  "agency": "fire",
+  "transcript": "Engine 3 en route.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Engine 3"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1845,
+  "agency": "fire",
+  "transcript": "Battalion 2 responding.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Battalion 2"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 1900,
+  "agency": "sheriff",
+  "transcript": "Lancaster 14, clear, roadway is open.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Lancaster 14"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 2050,
+  "agency": "fire",
+  "transcript": "Engine 3 on scene, one vehicle fully involved, no exposures, state patrol is on scene for traffic.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Engine 3"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 2100,
+  "agency": "police",
+  "transcript": "Adam 20, we're clear of 23rd and Y, victim transported, taking a report at the hospital.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Adam 20"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 2400,
+  "agency": "sheriff",
+  "transcript": "Lancaster 7, suspicious vehicle, Pine Lake Road and South 84th, dark SUV parked behind the strip mall for the last hour, occupied.",
+  "incident_type": "suspicious vehicle",
+  "summary": "Occupied dark SUV parked behind a strip mall for an hour",
+  "location_text": "Pine Lake Road and South 84th",
+  "geocode_query": "Pine Lake Rd & S 84th St, Lincoln, NE",
+  "location_kind": "intersection",
+  "lat": 40.7374,
+  "lon": -96.6064,
+  "units": [
+   "Lancaster 7"
+  ],
+  "confidence": 0.82,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 2430,
+  "agency": "sheriff",
+  "transcript": "Lancaster 7, ten-seventy-six.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Lancaster 7"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 2600,
+  "agency": "fire",
+  "transcript": "Engine 3 clear, back in service.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Engine 3"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 2700,
+  "agency": "sheriff",
+  "transcript": "Lancaster 7, ten-ninety-seven.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Lancaster 7"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 2800,
+  "agency": "police",
+  "transcript": "Any unit in the area of 70th and O, stand by for traffic.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 3000,
+  "agency": "police",
+  "transcript": "David 22, welfare check at the Casey's on Cornhusker Highway, caller says a male has been sleeping in his car for three hours.",
+  "incident_type": "welfare check",
+  "summary": "Male asleep in a car at Casey's for three hours",
+  "location_text": "the Casey's on Cornhusker Highway",
+  "geocode_query": "Casey's, Cornhusker Hwy, Lincoln, NE",
+  "location_kind": "business",
+  "lat": 40.8339,
+  "lon": -96.6826,
+  "units": [
+   "David 22"
+  ],
+  "confidence": 0.65,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 3030,
+  "agency": "police",
+  "transcript": "David 22, copy, en route.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "David 22"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 3200,
+  "agency": "sheriff",
+  "transcript": "Lancaster 7, clear, that was an employee waiting on a ride.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Lancaster 7"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 3400,
+  "agency": "police",
+  "transcript": "David 22, 10-97.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "David 22"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 3600,
+  "agency": "fire",
+  "transcript": "Engine 1, Truck 1, Battalion 1, gas leak, 13th and South Street, strong odor of natural gas outside, Black Hills has been notified.",
+  "incident_type": "gas leak",
+  "summary": "Strong odor of natural gas outside, utility notified",
+  "location_text": "13th and South Street",
+  "geocode_query": "S 13th St & South St, Lincoln, NE",
+  "location_kind": "intersection",
+  "lat": 40.7956,
+  "lon": -96.7098,
+  "units": [
+   "Engine 1",
+   "Truck 1",
+   "Battalion 1"
+  ],
+  "confidence": 0.86,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 3630,
+  "agency": "fire",
+  "transcript": "Engine 1 en route.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Engine 1"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 3640,
+  "agency": "fire",
+  "transcript": "Truck 1 responding.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Truck 1"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 3850,
+  "agency": "fire",
+  "transcript": "Engine 1 on scene, readings are elevated at the meter, evacuating two houses.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Engine 1"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 3900,
+  "agency": "police",
+  "transcript": "David 22, clear, party was just tired, he's moving along.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "David 22"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 4200,
+  "agency": "fire",
+  "transcript": "Medic 5, be advised Bryan East is on diversion.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Medic 5"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 4800,
+  "agency": "fire",
+  "transcript": "Battalion 1, Black Hills has the leak secured, all companies clear.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Battalion 1"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 5100,
+  "agency": "police",
+  "transcript": "Adam 30, 10-8.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Adam 30"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ },
+ {
+  "offset_sec": 5380,
+  "agency": "police",
+  "transcript": "Lincoln, show Baker 14 back in service.",
+  "incident_type": null,
+  "summary": null,
+  "location_text": null,
+  "geocode_query": null,
+  "location_kind": null,
+  "lat": null,
+  "lon": null,
+  "units": [
+   "Baker 14"
+  ],
+  "confidence": 0.0,
+  "spoken_time": null
+ }
+]
