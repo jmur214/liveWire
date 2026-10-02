@@ -47,8 +47,8 @@ struct Incident: Codable, Identifiable, Hashable {
     }
 
     /// Units as "Engine 1 en route" chips, stable order.
-    var unitChips: [(unit: String, status: String)] {
-        units.keys.sorted().map { (unit: Format.unitName($0), status: Format.unitStatus(units[$0] ?? "dispatched")) }
+    var unitChips: [UnitChip] {
+        units.keys.sorted().map { UnitChip(unit: Format.unitName($0), status: Format.unitStatus(units[$0] ?? "dispatched")) }
     }
 
     /// "Truck 8, Battalion 1" for banners and push bodies.
@@ -62,6 +62,12 @@ struct Incident: Codable, Identifiable, Hashable {
 
     static func == (a: Incident, b: Incident) -> Bool { a.id == b.id && a.lastHeard == b.lastHeard && a.txCount == b.txCount && a.status == b.status && a.units == b.units && a.summary == b.summary && a.incidentType == b.incidentType && a.reportedWrong == b.reportedWrong }
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
+}
+
+struct UnitChip: Identifiable, Hashable {
+    var unit: String
+    var status: String
+    var id: String { unit }
 }
 
 struct IncidentsResponse: Codable {

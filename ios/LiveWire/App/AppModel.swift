@@ -343,15 +343,15 @@ final class AppModel {
         }
     }
 
-    /// Feed row tap. Mapped rows pan + enlarge the pin; every row highlights briefly.
+    /// Feed row tap. Mapped rows pan + enlarge the pin; unmapped rows only highlight (0.5 s).
     func focus(on tx: Transmission) {
         highlightedTransmissionId = tx.id
-        let hold: Double = tx.incidentId != nil ? 2.5 : 0.5
+        let hold: Double = tx.isMapped ? 2.5 : 0.5
         Task { [weak self] in
             try? await Task.sleep(for: .seconds(hold))
             if self?.highlightedTransmissionId == tx.id { self?.highlightedTransmissionId = nil }
         }
-        guard let iid = tx.incidentId, let inc = store.incident(iid) else { return }
+        guard tx.isMapped, let iid = tx.incidentId, let inc = store.incident(iid) else { return }
         selectedIncidentId = nil
         focusedIncidentId = iid
         // The sheet sits at the half detent, so centre the pin in the top half.

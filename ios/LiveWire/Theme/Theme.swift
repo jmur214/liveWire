@@ -158,6 +158,15 @@ enum Format {
         return "\(Int(s / 86400))d ago"
     }
 
+    /// "2 min ago", "45 sec ago", "1.2 h ago" (compact card)
+    static func agoLong(_ unix: Double, now: Date = Date()) -> String {
+        let s = max(0, now.timeIntervalSince1970 - unix)
+        if s < 60 { return "\(Int(s)) sec ago" }
+        if s < 3600 { return "\(Int(s / 60)) min ago" }
+        if s < 86400 { return String(format: "%.1f h ago", s / 3600) }
+        return "\(Int(s / 86400)) d ago"
+    }
+
     /// "11:52 AM · 2m ago"
     static func timeAndAgo(_ unix: Double, now: Date = Date()) -> String {
         "\(time(unix)) · \(ago(unix, now: now))"
