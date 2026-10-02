@@ -110,6 +110,7 @@ final class LatestId: @unchecked Sendable {
 final class AppModel {
     let settings: Settings
     let location = LocationService()
+    let audio: AudioEngine
 
     private(set) var store = FeedStore()
     var city: City?
@@ -146,6 +147,7 @@ final class AppModel {
 
     init(settings: Settings) {
         self.settings = settings
+        audio = AudioEngine(settings: settings)
         cameraPosition = .region(MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 40.8136, longitude: -96.7026), span: Self.defaultSpan))
     }
@@ -193,8 +195,18 @@ final class AppModel {
 
     // MARK: Lifecycle
 
+    @ObservationIgnored private var didResumeAudio = false
+
     func start() {
         location.requestWhenInUse()
+        if !didResumeAudio {
+            didResumeAudio = true
+            // No autoplay on cold launch unless we were playing when backgrounded/killed
+            // and "Resume on launch" is on.
+            if settings.resumeOnLaunch && settings.wasPlaying {
+                audio.startLive()
+            }
+        }
         if tickTask == nil {
             tickTask = Task { [weak self] in
                 while !Task.isCancelled {
@@ -211,6 +223,7 @@ final class AppModel {
         streamTask?.cancel()
         stream?.stop()
         stream = nil
+        audio.configure(api: settings.apiClient)
         guard let api = settings.apiClient else {
             connection = .offline("Invalid server URL")
             return
@@ -271,11 +284,14 @@ final class AppModel {
         }
     }
 
-    /// Hook for live audio (AudioEngine enqueues here).
-    var onNewTransmission: ((Transmission) -> Void)?
+    /// Live audio (A3): every new transmission that passes the agency filter — and,
+    /// with Dispatch-only on, has a summary — is appended to the player's queue.
+    func shouldPlay(_ t: Transmission) -> Bool {
+        passesFilter(t.agency) && (!settings.dispatchOnly || t.summary != nil)
+    }
 
     private func didReceive(_ t: Transmission) {
-        onNewTransmission?(t)
+        if shouldPlay(t) { audio.enqueue(t) }
     }
 
     func refreshHealth() async -> Health? {
@@ -314,6 +330,7 @@ final class AppModel {
         var s = settings.enabledAgencies
         if s.contains(agency) { s.remove(agency) } else { s.insert(agency) }
         settings.enabledAgencies = s
+        audio.dropQueued { !self.shouldPlay($0) }
         if let sel = selectedIncident, !passesFilter(sel.agency) { select(nil) }
     }
 
