@@ -1,0 +1,15 @@
+{
+  "id": "lincoln",
+  "name": "Lincoln, NE",
+  "tz": "America/Chicago",
+  "center": [40.8136, -96.7026],
+  "bbox": [-96.85, 40.65, -96.50, 40.95],
+  "stream_url_env": "STREAM_URL",
+  "vocab_file": "lincoln_vocab.txt",
+  "agencies": {
+    "police":  {"name": "Lincoln Police Department", "delayed": true},
+    "fire":    {"name": "Lincoln Fire & Rescue", "delayed": false},
+    "sheriff": {"name": "Lancaster County Sheriff", "delayed": false}
+  },
+  "extract_hints": "Lincoln conventions: lettered streets run east-west (A St through Y St, with O St the main one); numbered streets run north-south, and \"27th\" means N 27th or S 27th depending on side of O St. If the side isn't stated, omit the prefix. Common names: Cornhusker Hwy, Capitol Pkwy, Nebraska Pkwy, Old Cheney Rd, Pioneers Blvd, Van Dorn St, Holdrege St, Superior St, Highway 2, I-80. Police units are phonetic letter + number (Baker 12, Charlie 4); fire units are Engine/Truck/Medic/Battalion + number; sheriff units are \"Lancaster\" + number. LPD = Lincoln Police, LFR = Lincoln Fire & Rescue, LSO = Lancaster County Sheriff."
+}

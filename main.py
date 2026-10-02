@@ -26,6 +26,7 @@ import numpy as np
 
 import config
 import db
+import incidents
 from delay import DelayEstimator
 from extract import Incident, extract
 from geocode import geocode
@@ -64,29 +65,33 @@ def store(
     delays: DelayEstimator,
 ) -> int:
     """Everything after transcription/extraction/geocoding: delay estimate, clip,
-    DB row. Shared by the live pipeline and replay mode. Returns the row id."""
+    DB row, incident grouping (and alerts on a new incident). Shared by the live
+    pipeline and replay mode. Returns the transmission row id."""
     if inc.agency == "police" or inc.spoken_time:
         delays.observe(text, heard_at, inc.spoken_time)
     duration = len(audio) / config.SAMPLE_RATE
-    tx_id = db.insert(
-        {
-            "heard_at": heard_at,
-            "occurred_at": delays.actual_time(heard_at, inc.agency),
-            "duration": duration,
-            "transcript": text,
-            "asr_confidence": asr_conf,
-            "audio_file": _save_clip(audio, heard_at),
-            "agency": inc.agency,
-            "incident_type": inc.incident_type,
-            "location_text": inc.location_text,
-            "geocode_query": inc.geocode_query,
-            "units": inc.units,
-            "summary": inc.summary,
-            "extract_confidence": inc.confidence,
-            "lat": lat,
-            "lon": lon,
-        }
-    )
+    row = {
+        "heard_at": heard_at,
+        "occurred_at": delays.actual_time(heard_at, inc.agency),
+        "duration": duration,
+        "transcript": text,
+        "asr_confidence": asr_conf,
+        "audio_file": _save_clip(audio, heard_at),
+        "agency": inc.agency,
+        "incident_type": inc.incident_type,
+        "location_text": inc.location_text,
+        "geocode_query": inc.geocode_query,
+        "location_kind": inc.location_kind,
+        "units": inc.units,
+        "summary": inc.summary,
+        "extract_confidence": inc.confidence,
+        "lat": lat,
+        "lon": lon,
+        "city": config.CITY_ID,
+    }
+    row["id"] = tx_id = db.insert(row)
+    incidents.assign(row)
+    db.set_meta("police_delay_sec", f"{delays.police_delay:.0f}")
     return tx_id
 
 
@@ -209,6 +214,22 @@ def replay(path: str, speed: float, loop: bool, delays: DelayEstimator) -> None:
 
 # --- Entry point -----------------------------------------------------------------------------
 
+def _start_heartbeat(delays: DelayEstimator, every: float = 5.0) -> None:
+    """Publish liveness + the current police delay for /api/health (the API runs in
+    another process and only sees the database)."""
+
+    def loop() -> None:
+        while True:
+            try:
+                db.set_meta("ingest_heartbeat", f"{time.time():.0f}")
+                db.set_meta("police_delay_sec", f"{delays.police_delay:.0f}")
+            except Exception:
+                log.exception("heartbeat failed")
+            time.sleep(every)
+
+    threading.Thread(target=loop, name="heartbeat", daemon=True).start()
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--source", default=None, help="stream URL or local audio file (default: $STREAM_URL)")
@@ -223,12 +244,17 @@ def main() -> None:
     )
     db.init()
     delays = DelayEstimator()
+    _start_heartbeat(delays)
 
     if args.replay:
         if args.speed <= 0:
             raise SystemExit("--speed must be > 0")
+        # Simulated minutes pass `speed` times faster, so the 30 min idle rule does too.
+        incidents.start_clearer(idle_sec=config.INCIDENT_CLEAR_SEC / args.speed,
+                                interval_sec=max(0.5, 60.0 / args.speed))
         replay(args.replay, args.speed, args.loop, delays)
         return
+    incidents.start_clearer()
 
     # Transcription is the slow step; decouple it from the stream reader so a
     # long transcription never causes ffmpeg's pipe to back up.

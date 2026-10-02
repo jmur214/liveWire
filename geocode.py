@@ -1,8 +1,8 @@
-"""Resolve a normalized location query to lat/lon inside Lincoln, with caching.
+"""Resolve a normalized location query to lat/lon inside the city bbox, with caching.
 
 Nominatim is free but rate-limited (1 req/s) and weak on intersections and
 business names. Mapbox handles those much better; set GEOCODER=mapbox and
-MAPBOX_TOKEN to switch. Both are restricted to the Lincoln bounding box.
+MAPBOX_TOKEN to switch. Both are restricted to the city bounding box.
 """
 from __future__ import annotations
 
@@ -27,11 +27,12 @@ def _cache() -> sqlite3.Connection:
 
 
 def _in_bbox(lat: float, lon: float) -> bool:
-    w, s, e, n = config.LINCOLN_BBOX
+    w, s, e, n = config.BBOX
     return s <= lat <= n and w <= lon <= e
 
 
-_INTERSECTION = re.compile(r"^(.*?)\s*(?:&|\band\b|@)\s*(.*?)(?:,\s*Lincoln.*)?$", re.I)
+_CITY_WORD = re.escape(config.CITY_NAME.split(",")[0].strip())
+_INTERSECTION = re.compile(rf"^(.*?)\s*(?:&|\band\b|@)\s*(.*?)(?:,\s*{_CITY_WORD}.*)?$", re.I)
 
 
 def _nominatim(q: str) -> tuple[float, float] | None:
@@ -40,7 +41,7 @@ def _nominatim(q: str) -> tuple[float, float] | None:
     if wait > 0:
         time.sleep(wait)
     _last_nominatim = time.time()
-    w, s, e, n = config.LINCOLN_BBOX
+    w, s, e, n = config.BBOX
     r = requests.get(
         "https://nominatim.openstreetmap.org/search",
         params={"q": q, "format": "json", "limit": 1, "viewbox": f"{w},{n},{e},{s}", "bounded": 1},
@@ -57,8 +58,8 @@ def _nominatim(q: str) -> tuple[float, float] | None:
 def _nominatim_intersection(a: str, b: str) -> tuple[float, float] | None:
     """Nominatim can't do 'A & B'. Geocode both streets and take the midpoint
     if they're close; crude but works surprisingly often in a grid city."""
-    pa = _nominatim(f"{a}, Lincoln, NE")
-    pb = _nominatim(f"{b}, Lincoln, NE")
+    pa = _nominatim(f"{a}, {config.CITY_NAME}")
+    pb = _nominatim(f"{b}, {config.CITY_NAME}")
     if not pa or not pb:
         return None
     lat, lon = (pa[0] + pb[0]) / 2, (pa[1] + pb[1]) / 2
@@ -69,7 +70,7 @@ def _nominatim_intersection(a: str, b: str) -> tuple[float, float] | None:
 
 
 def _mapbox(q: str) -> tuple[float, float] | None:
-    w, s, e, n = config.LINCOLN_BBOX
+    w, s, e, n = config.BBOX
     r = requests.get(
         "https://api.mapbox.com/search/geocode/v6/forward",
         params={
@@ -115,7 +116,7 @@ def geocode(query: str, kind: str | None = None) -> tuple[float, float] | None:
         return None  # don't cache transient errors
 
     if result and not _in_bbox(*result):
-        log.info("geocode outside Lincoln, dropping: %r -> %s", q, result)
+        log.info("geocode outside %s, dropping: %r -> %s", config.CITY_NAME, q, result)
         result = None
 
     con.execute(

@@ -1,4 +1,9 @@
-"""Central configuration. Everything can be overridden with environment variables."""
+"""Central configuration. Everything can be overridden with environment variables.
+
+The city config (`cities/<id>.json`, selected by CITY) supplies the bounding
+box, map centre, time zone, agencies, vocabulary file and extraction hints.
+"""
+import json
 import os
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -6,6 +11,31 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).parent
 DATA_DIR = ROOT / "data"
 DATA_DIR.mkdir(exist_ok=True)
+VERSION = "1.0.0"
+
+# --- City -------------------------------------------------------------------
+CITIES_DIR = ROOT / "cities"
+CITY = os.environ.get("CITY", "lincoln")
+
+
+def load_city(city_id: str) -> dict:
+    return json.loads((CITIES_DIR / f"{city_id}.json").read_text())
+
+
+def all_cities() -> list[dict]:
+    return sorted((json.loads(p.read_text()) for p in CITIES_DIR.glob("*.json")), key=lambda c: c["id"])
+
+
+_city = load_city(CITY)
+CITY_ID: str = _city["id"]
+CITY_NAME: str = _city["name"]
+CITY_TZ = ZoneInfo(_city["tz"])                 # spoken clock times are local time
+BBOX = tuple(_city["bbox"])                      # (west, south, east, north)
+LINCOLN_BBOX = BBOX                              # legacy name, kept for older imports
+MAP_CENTER = tuple(_city["center"])              # (lat, lon)
+AGENCIES: dict = _city["agencies"]               # {"police": {"name": ..., "delayed": bool}, ...}
+EXTRACT_HINTS: str = _city.get("extract_hints", "")
+VOCAB_FILE = ROOT / _city.get("vocab_file", f"{CITY_ID}_vocab.txt")
 
 # --- Audio source -----------------------------------------------------------
 # Broadcastify feed 14395 = "Lincoln Police and Fire, Lancaster County Sheriff"
@@ -13,14 +43,16 @@ DATA_DIR.mkdir(exist_ok=True)
 # a Broadcastify Premium account; put it in STREAM_URL. Any ffmpeg-readable
 # source works here — an HTTP stream, an RTL-SDR via trunk-recorder, a local
 # file for testing (see tests/).
-STREAM_URL = os.environ.get("STREAM_URL", "")
+STREAM_URL = os.environ.get(_city.get("stream_url_env", "STREAM_URL"), "")
 STREAM_HEADERS = os.environ.get("STREAM_HEADERS", "")  # e.g. "Cookie: ...\r\n"
 
 # --- Transcription ----------------------------------------------------------
-WHISPER_MODEL = os.environ.get("WHISPER_MODEL", "small.en")   # tiny/base/small/medium/large-v3
+TRANSCRIBER = os.environ.get("TRANSCRIBER", "groq")           # local | groq | openai
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+WHISPER_MODEL = os.environ.get("WHISPER_MODEL", "small.en")   # local: tiny/base/small/medium/large-v3
 WHISPER_DEVICE = os.environ.get("WHISPER_DEVICE", "cpu")      # "cuda" if you have a GPU
 WHISPER_COMPUTE = os.environ.get("WHISPER_COMPUTE", "int8")   # int8 on CPU, float16 on GPU
-VOCAB_FILE = ROOT / "lincoln_vocab.txt"
 
 # --- Voice activity detection ---------------------------------------------
 SAMPLE_RATE = 16000
@@ -35,11 +67,9 @@ EXTRACT_MODEL = os.environ.get("EXTRACT_MODEL", "claude-haiku-4-5-20251001")
 MIN_TRANSCRIPT_CHARS = 20
 
 # --- Geocoding --------------------------------------------------------------
-# Lincoln, NE bounding box: (west, south, east, north). Keeps "Vine St" in Lincoln.
-LINCOLN_BBOX = (-96.85, 40.65, -96.50, 40.95)
 GEOCODER = os.environ.get("GEOCODER", "nominatim")   # nominatim | mapbox
 MAPBOX_TOKEN = os.environ.get("MAPBOX_TOKEN", "")
-NOMINATIM_USER_AGENT = "livewire-lincoln (personal project)"
+NOMINATIM_USER_AGENT = f"livewire-{CITY_ID} (personal project)"
 NOMINATIM_MIN_INTERVAL = 1.1   # their usage policy: max 1 req/sec
 
 # --- Delay handling ---------------------------------------------------------
@@ -48,12 +78,23 @@ NOMINATIM_MIN_INTERVAL = 1.1   # their usage policy: max 1 req/sec
 # dispatchers reading the clock on air (see delay.py) and back-date events.
 DEFAULT_POLICE_DELAY_SEC = int(os.environ.get("DEFAULT_POLICE_DELAY_SEC", "900"))
 
+# --- Incident grouping (DESIGN.md A4) ---------------------------------------
+INCIDENT_JOIN_M = 150.0        # a mapped transmission within this joins an active incident
+INCIDENT_CLEAR_SEC = 1800      # active -> cleared after this long with no transmissions
+
+# --- API --------------------------------------------------------------------
+# Single shared secret; every /api/* and /audio/* request must carry
+# "Authorization: Bearer <API_TOKEN>". Unset => "dev-token" (server logs a warning).
+API_TOKEN = os.environ.get("API_TOKEN", "")
+API_TOKEN_IS_DEFAULT = not API_TOKEN
+if API_TOKEN_IS_DEFAULT:
+    API_TOKEN = "dev-token"
+
 # --- Storage / web ----------------------------------------------------------
 DB_PATH = DATA_DIR / "events.sqlite"
 AUDIO_DIR = DATA_DIR / "audio"        # per-transmission clips, for playback on the map
 AUDIO_DIR.mkdir(exist_ok=True)
 KEEP_AUDIO_HOURS = 24
+KEEP_INCIDENT_DAYS = 7
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8000"))
-MAP_CENTER = (40.8136, -96.7026)     # downtown Lincoln
-CITY_TZ = ZoneInfo("America/Chicago")  # spoken clock times are local time

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lincoln Scanner Map</title>
+<title>LiveWire — Lincoln Scanner Map</title>
 <link rel="stylesheet" href="/static/leaflet.css">
 <script src="/static/leaflet.js"></script>
 <style>
@@ -39,7 +39,7 @@
   <div id="map"></div>
   <aside id="side">
     <header>
-      <h1>Lincoln Scanner Map</h1>
+      <h1>LiveWire · Lincoln</h1>
       <select id="hours">
         <option value="0.5">30 min</option>
         <option value="1">1 h</option>
@@ -54,6 +54,22 @@
 </div>
 <script>
 const COLORS = { police:'#4f8ef7', fire:'#f05d4f', sheriff:'#d8a93c', unknown:'#8a90a3' };
+// The API requires a bearer token (config.API_TOKEN). Kept in localStorage; <audio> tags can't
+// send headers, so clip URLs carry it as ?token= instead.
+let TOKEN = localStorage.getItem('livewire_token') || '';
+function askToken(msg) {
+  const t = prompt(msg || 'LiveWire API token');
+  if (t) { TOKEN = t.trim(); localStorage.setItem('livewire_token', TOKEN); }
+  return TOKEN;
+}
+if (!TOKEN) askToken();
+async function api(path) {
+  const r = await fetch(path, { headers: { Authorization: 'Bearer ' + TOKEN } });
+  if (r.status === 401) { localStorage.removeItem('livewire_token'); if (askToken('Token rejected — enter the API token')) location.reload(); throw new Error('unauthorized'); }
+  if (!r.ok) throw new Error('http ' + r.status);
+  return r.json();
+}
+function audioUrl(file) { return `/audio/${file}?token=${encodeURIComponent(TOKEN)}`; }
 const map = L.map('map', { zoomControl:true }).setView([40.8136, -96.7026], 12);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution:'&copy; OpenStreetMap &copy; CARTO', maxZoom:19 }).addTo(map);
@@ -76,7 +92,7 @@ function popupHtml(e) {
     <span style="color:#8a90a3">${esc(e.location_text||'')} · ${clock(e.occurred_at)}${delayed}</span><br>
     <span style="font-size:12px">${esc(e.transcript)}</span><br>
     ${e.units && e.units.length ? '<span style="font-size:11px;color:#8a90a3">'+esc(e.units.join(', '))+'</span><br>' : ''}
-    <audio controls preload="none" src="/audio/${e.audio_file}" style="width:100%;height:28px;margin-top:6px"></audio></div>`;
+    <audio controls preload="none" src="${audioUrl(e.audio_file)}" style="width:100%;height:28px;margin-top:6px"></audio></div>`;
 }
 
 function render(events, hours) {
@@ -103,7 +119,7 @@ function renderFeed(events) {
         ${clock(e.occurred_at)} · ${ago(e.occurred_at)}${e.lat ? ' · 📍' : ''}</div>
       ${e.summary ? `<div class="summary">${esc(e.summary)}</div>` : ''}
       <div class="text">${esc(e.transcript)}</div>
-      <audio controls preload="none" src="/audio/${e.audio_file}"></audio>
+      <audio controls preload="none" src="${audioUrl(e.audio_file)}"></audio>
     </div>`).join('');
   feed.querySelectorAll('.tx').forEach(el => el.addEventListener('click', ev => {
     if (ev.target.tagName === 'AUDIO') return;
@@ -116,8 +132,8 @@ async function refresh() {
   const hours = +document.getElementById('hours').value;
   try {
     const [m, t] = await Promise.all([
-      fetch(`/api/events?hours=${hours}`).then(r => r.json()),
-      fetch(`/api/transcript?hours=${hours}`).then(r => r.json()),
+      api(`/api/events?hours=${hours}`),
+      api(`/api/transcript?hours=${hours}`),
     ]);
     render(m.events, hours);
     renderFeed(t.events);
