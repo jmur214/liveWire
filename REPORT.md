@@ -145,6 +145,9 @@ in Xcode on your side.
 5. Tune `lincoln_vocab.txt` and `cities/lincoln.json → extract_hints` as you
    hear real traffic; switch to `GEOCODER=mapbox` if intersections miss.
 
+## Every decision (verbatim from `DECISIONS.md`)
+
+
 
 - **Replay clock reads use `spoken_time: "heard-840"` and a `{clock}` placeholder in the transcript** — a fixed "23:14" in the fixture would give a different (often >1 h, discarded) delay sample depending on when the replay runs; the relative form yields a deterministic ~14 min sample every run, which is what B5 needs to verify back-dating.
 - **`config.CITY_TZ` replaces the `America/Chicago` constant in `delay.py`** — the clock-time maths must follow the city config (B2.3) rather than a hard-coded zone.
