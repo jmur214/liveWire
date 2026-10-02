@@ -114,6 +114,7 @@ final class AppModel {
 
     private(set) var store = FeedStore()
     var city: City?
+    var cities: [City] = []
     var health: Health?
     var connection: ConnectionState = .connecting
     var lastError: String?
@@ -234,6 +235,7 @@ final class AppModel {
 
     private func run(_ api: APIClient) async {
         if let cities = try? await api.cities() {
+            self.cities = cities
             let c = cities.first { $0.id == settings.cityId } ?? cities.first
             if let c, c.id != city?.id || store.incidents.isEmpty {
                 cameraPosition = .region(MKCoordinateRegion(center: c.centerCoordinate, span: Self.defaultSpan))
