@@ -49,7 +49,11 @@ STREAM_HEADERS = os.environ.get("STREAM_HEADERS", "")  # e.g. "Cookie: ...\r\n"
 # --- Transcription ----------------------------------------------------------
 TRANSCRIBER = os.environ.get("TRANSCRIBER", "groq")           # local | groq | openai
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+GROQ_URL = os.environ.get("GROQ_URL", "https://api.groq.com/openai/v1/audio/transcriptions")
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "whisper-large-v3-turbo")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+OPENAI_URL = os.environ.get("OPENAI_URL", "https://api.openai.com/v1/audio/transcriptions")
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "whisper-1")
 WHISPER_MODEL = os.environ.get("WHISPER_MODEL", "small.en")   # local: tiny/base/small/medium/large-v3
 WHISPER_DEVICE = os.environ.get("WHISPER_DEVICE", "cpu")      # "cuda" if you have a GPU
 WHISPER_COMPUTE = os.environ.get("WHISPER_COMPUTE", "int8")   # int8 on CPU, float16 on GPU
@@ -59,6 +63,9 @@ SAMPLE_RATE = 16000
 MIN_SEGMENT_SEC = 0.8     # drop clicks/squelch tails shorter than this
 MAX_SEGMENT_SEC = 30.0    # force-cut long runs so transcription stays responsive
 SILENCE_SEC = 1.2         # gap that ends a transmission
+# Energy-gate fallback (used when torch/Silero is not installed, i.e. on the VPS):
+ENERGY_GATE_THRESHOLD = float(os.environ.get("ENERGY_GATE_THRESHOLD", "0.015"))  # RMS of a 32 ms frame
+ENERGY_HANGOVER_MS = int(os.environ.get("ENERGY_HANGOVER_MS", "300"))            # keep "speech" this long after it drops
 
 # --- Extraction -------------------------------------------------------------
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")

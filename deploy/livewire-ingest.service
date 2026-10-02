@@ -1,0 +1,22 @@
+[Unit]
+Description=LiveWire ingest (stream -> transcribe -> extract -> incidents -> alerts)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=livewire
+Group=livewire
+WorkingDirectory=/opt/livewire
+EnvironmentFile=/opt/livewire/.env
+ExecStart=/opt/livewire/.venv/bin/python main.py
+Restart=always
+RestartSec=5
+Nice=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/livewire/data
+
+[Install]
+WantedBy=multi-user.target

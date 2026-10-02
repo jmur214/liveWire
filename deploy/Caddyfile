@@ -1,0 +1,9 @@
+# Caddy obtains and renews the TLS certificate for this domain automatically.
+# iOS App Transport Security requires HTTPS; the app has no ATS exception.
+REPLACE_ME_DOMAIN {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:8000 {
+		# /api/stream is a long-lived text/event-stream: forward bytes as they arrive.
+		flush_interval -1
+	}
+}

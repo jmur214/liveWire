@@ -1,0 +1,21 @@
+[Unit]
+Description=LiveWire API (FastAPI behind Caddy)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=livewire
+Group=livewire
+WorkingDirectory=/opt/livewire
+EnvironmentFile=/opt/livewire/.env
+ExecStart=/opt/livewire/.venv/bin/uvicorn server:app --host 127.0.0.1 --port 8000 --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/livewire/data
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,5 @@
+# Optional: run Whisper on this machine (TRANSCRIBER=local) and use Silero VAD.
+# torch is large (~2 GB); the VPS image skips it and uses the energy-gate VAD.
+-r requirements.txt
+faster-whisper>=1.0
+torch>=2.2

@@ -35,10 +35,15 @@ def _ffmpeg_pcm(source: str) -> subprocess.Popen:
 
 
 class _SpeechDetector:
-    """Returns True for frames that contain speech."""
+    """Returns True for frames that contain speech.
+
+    Silero VAD when torch is installed; otherwise an RMS energy gate with a
+    hangover so brief dips mid-sentence don't split a transmission."""
 
     def __init__(self) -> None:
         self.model = None
+        self._hang_frames = max(1, -(-config.ENERGY_HANGOVER_MS // FRAME_MS))  # ceil: at least the configured hangover
+        self._hang = 0
         try:
             import torch  # noqa: F401
 
@@ -46,13 +51,20 @@ class _SpeechDetector:
             self._torch = torch
             log.info("Using Silero VAD")
         except Exception as e:  # pragma: no cover
-            log.warning("Silero VAD unavailable (%s); falling back to energy gate", e)
+            log.warning("Silero VAD unavailable (%s); using energy gate (threshold %.3f, hangover %d ms)",
+                        e, config.ENERGY_GATE_THRESHOLD, config.ENERGY_HANGOVER_MS)
 
     def __call__(self, frame: np.ndarray) -> bool:
         if self.model is not None:
             t = self._torch.from_numpy(frame)
             return float(self.model(t, config.SAMPLE_RATE).item()) > 0.5
-        return float(np.sqrt(np.mean(frame**2))) > 0.01
+        if float(np.sqrt(np.mean(frame**2))) > config.ENERGY_GATE_THRESHOLD:
+            self._hang = self._hang_frames
+            return True
+        if self._hang > 0:
+            self._hang -= 1
+            return True
+        return False
 
 
 def transmissions(source: str | None = None) -> Iterator[tuple[float, np.ndarray]]:
