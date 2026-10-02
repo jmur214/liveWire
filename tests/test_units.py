@@ -31,6 +31,7 @@ def test_normalize_unit():
     assert normalize_unit("Engine  1,") == "engine 1"
     assert normalize_unit(" Battalion 1 ") == "battalion 1"
     assert normalize_unit("Lancaster-14") == "lancaster14"  # hyphen dropped consistently
+    assert normalize_unit("engine_1") == "engine 1"           # never an underscore (snake-case decoders would mangle it)
 
 
 def test_short_address():

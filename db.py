@@ -313,18 +313,20 @@ def delete_device(token: str) -> None:
 def alert_stats(token: str) -> dict:
     """Alerts in the last 7 days for the Alerts screen: total, per place, by type, near-me."""
     since = time.time() - 7 * 86400
-    stats: dict = {"week_total": 0, "places": {}, "types": 0, "near_me": 0}
+    stats: dict = {"week_total": 0, "places": [], "types": 0, "near_me": 0}
+    per_place: dict[str, int] = {}
     with connect() as con:
         for r in con.execute("SELECT reason, COUNT(*) n FROM alerts_sent WHERE token=? AND sent_at >= ? GROUP BY reason",
                              (token, since)):
             reason, n = r["reason"] or "", int(r["n"])
             stats["week_total"] += n
             if reason.startswith("place:"):
-                stats["places"][reason[6:]] = stats["places"].get(reason[6:], 0) + n
+                per_place[reason[6:]] = per_place.get(reason[6:], 0) + n
             elif reason.startswith("type:"):
                 stats["types"] += n
             elif reason == "near_me":
                 stats["near_me"] += n
+    stats["places"] = [{"name": k, "count": v} for k, v in sorted(per_place.items())]
     return stats
 
 

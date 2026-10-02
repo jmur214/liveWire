@@ -10,6 +10,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
 
     var location: CLLocation?
     var authorization: CLAuthorizationStatus = .notDetermined
+    @ObservationIgnored private var wantsBackground = false
     /// Called on every location update (used to report `last_location` for near-me alerts).
     @ObservationIgnored var onUpdate: ((CLLocation) -> Void)?
 
@@ -41,13 +42,20 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     /// Background location updates for "Near me now". Requires the `location`
     /// background mode (Info.plist) and Always authorization to be useful.
     func setBackgroundUpdates(_ on: Bool) {
-        manager.allowsBackgroundLocationUpdates = on && authorization == .authorizedAlways
-        manager.showsBackgroundLocationIndicator = false
+        wantsBackground = on
+        applyBackgroundFlag()
         if on {
             manager.startMonitoringSignificantLocationChanges()
         } else {
             manager.stopMonitoringSignificantLocationChanges()
         }
+    }
+
+    /// `allowsBackgroundLocationUpdates` is only legal with Always; re-applied whenever
+    /// authorization changes, since Always is usually granted after the request.
+    private func applyBackgroundFlag() {
+        manager.allowsBackgroundLocationUpdates = wantsBackground && authorization == .authorizedAlways
+        manager.showsBackgroundLocationIndicator = false
     }
 
     func distance(to coordinate: CLLocationCoordinate2D) -> CLLocationDistance? {
@@ -64,6 +72,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authorization = manager.authorizationStatus
+        applyBackgroundFlag()
         if isAuthorized {
             manager.startUpdatingLocation()
         }

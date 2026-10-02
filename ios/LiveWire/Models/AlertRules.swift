@@ -55,10 +55,19 @@ struct DeviceRegistration: Codable {
 
 /// Alerts delivered in the last 7 days, from the POST /api/device response.
 struct AlertStats: Codable, Equatable {
+    struct PlaceCount: Codable, Equatable {
+        var name: String
+        var count: Int
+    }
+
     var weekTotal: Int
-    var places: [String: Int]
+    var places: [PlaceCount]
     var types: Int
     var nearMe: Int
+
+    func count(forPlace name: String) -> Int {
+        places.first { $0.name == name }?.count ?? 0
+    }
 }
 
 struct DeviceResponse: Codable {

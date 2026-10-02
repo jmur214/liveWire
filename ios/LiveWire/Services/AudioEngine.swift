@@ -67,6 +67,9 @@ final class AudioEngine: NSObject, AVAudioPlayerDelegate {
     private let settings: Settings
     private var api: APIClient?
     private var player: AVAudioPlayer?
+    /// Loops silence while the scanner is on but no clip is playing, so iOS keeps the
+    /// app (and its SSE connection) alive in the background between transmissions.
+    private var keepAlive: AVAudioPlayer?
     private var meterTask: Task<Void, Never>?
     private var noticeTask: Task<Void, Never>?
     private var playAllRemaining: [Transmission] = []
@@ -102,6 +105,7 @@ final class AudioEngine: NSObject, AVAudioPlayerDelegate {
         isLive = true
         settings.wasPlaying = true
         activateSession()
+        startKeepAlive()
         updatePlaybackState()
         drain()
     }
@@ -115,6 +119,7 @@ final class AudioEngine: NSObject, AVAudioPlayerDelegate {
             current = nil
         }
         queue.removeAll()
+        stopKeepAlive()
         updatePlaybackState()
     }
 
@@ -244,6 +249,41 @@ final class AudioEngine: NSObject, AVAudioPlayerDelegate {
         try? AVAudioSession.sharedInstance().setActive(true)
     }
 
+    // MARK: - Background keep-alive
+
+    private func startKeepAlive() {
+        guard keepAlive == nil else { return }
+        guard let url = try? silentClipURL(), let p = try? AVAudioPlayer(contentsOf: url) else { return }
+        p.numberOfLoops = -1
+        p.volume = 0
+        p.prepareToPlay()
+        p.play()
+        keepAlive = p
+    }
+
+    private func stopKeepAlive() {
+        keepAlive?.stop()
+        keepAlive = nil
+    }
+
+    /// One second of 16 kHz mono silence, written once to Caches.
+    private func silentClipURL() throws -> URL {
+        let url = cacheDir.appending(path: "_silence.wav")
+        if FileManager.default.fileExists(atPath: url.path) { return url }
+        let rate: UInt32 = 16_000, frames: UInt32 = 16_000, bits: UInt16 = 16, channels: UInt16 = 1
+        let dataSize = frames * UInt32(channels) * UInt32(bits / 8)
+        var d = Data()
+        func le32(_ v: UInt32) { withUnsafeBytes(of: v.littleEndian) { d.append(contentsOf: $0) } }
+        func le16(_ v: UInt16) { withUnsafeBytes(of: v.littleEndian) { d.append(contentsOf: $0) } }
+        d.append(contentsOf: Array("RIFF".utf8)); le32(36 + dataSize); d.append(contentsOf: Array("WAVE".utf8))
+        d.append(contentsOf: Array("fmt ".utf8)); le32(16); le16(1); le16(channels); le32(rate)
+        le32(rate * UInt32(channels) * UInt32(bits / 8)); le16(channels * bits / 8); le16(bits)
+        d.append(contentsOf: Array("data".utf8)); le32(dataSize)
+        d.append(Data(count: Int(dataSize)))
+        try d.write(to: url, options: .atomic)
+        return url
+    }
+
     private func configureRemoteCommands() {
         let c = MPRemoteCommandCenter.shared()
         _ = c.playCommand.addTarget { [weak self] _ in
@@ -321,7 +361,8 @@ final class AudioEngine: NSObject, AVAudioPlayerDelegate {
         meterTask = Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(100))
-                guard let self, let p = self.player, p.isPlaying else { continue }
+                guard let self else { return }
+                guard let p = self.player, p.isPlaying else { continue }
                 p.updateMeters()
                 let db = p.averagePower(forChannel: 0)        // -160 … 0 dBFS
                 self.level = max(0, min(1, (db + 50) / 50))

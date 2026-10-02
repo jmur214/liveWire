@@ -34,7 +34,7 @@ struct AlertsView: View {
 
             Section("Near saved places, any type") {
                 ForEach($settings.alertRules.places) { $place in
-                    PlaceRow(place: $place, alertsThisWeek: model.push.stats?.places[place.name] ?? 0) {
+                    PlaceRow(place: $place, alertsThisWeek: model.push.stats?.count(forPlace: place.name) ?? 0) {
                         editingPlace = place
                     }
                 }

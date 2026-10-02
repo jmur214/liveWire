@@ -10,8 +10,8 @@ replay fixture, a Groq-shaped transcription stub and an APNs stub
 (`bash tests/acceptance.sh` → 12/12 PASS, output below). The iOS app is
 complete per §A2–A5 and §B4 but **could not be compiled here**: this Linux
 container has no Swift toolchain, Xcode or simulator. Every Swift file was
-written against the iOS 17 SDK and hand-reviewed (a second review pass is
-noted below) — expect first-build fix-ups of the kind a compiler
+written against the iOS 17 SDK and hand-reviewed twice (once by me, once by a
+second review pass) — expect first-build fix-ups of the kind a compiler
 catches in minutes, not design gaps.
 
 ## Commits (one per build step)
@@ -93,8 +93,8 @@ project generates.
 
 ## Known limitations / things to watch
 
-- **Swift is uncompiled.** See the review section below; anything a compiler
-  still flags should be a one-line fix.
+- **Swift is uncompiled.** The second review pass's findings are folded in (see
+  the section below); anything a compiler still flags should be a one-line fix.
 - **APNs delivery** is verified only to a stub (payload, headers, 410 handling,
   JWT ES256 signing with a throwaway key). Real delivery needs the `.p8` on
   the VPS and a device.
@@ -108,7 +108,24 @@ project generates.
 
 ## Second review pass over the Swift sources
 
-_In progress: a second, independent read-through of every Swift file for iOS 17 API misuse is running; its findings and fixes land in a follow-up commit and replace this note._
+A separate, independent read-through of all 31 Swift files (plus
+`project.yml`, both plists and the entitlements) against the iOS 17 SDK /
+Swift 5.10 rules found **no construct expected to fail compilation**: API
+names and availability, Observation macro usage, `@Bindable`/`Binding`
+chains, result-builder rules, every memberwise-initializer call site, Codable
+key mapping, actor-isolation of delegate witnesses, module/test-host setup.
+It raised five behavioural points; four are fixed in the follow-up commit:
+
+| Finding | Action |
+|---|---|
+| `allowsBackgroundLocationUpdates` was computed once, before Always authorization was granted, so "Near me now" never got continuous background updates | **Fixed** — `LocationService` remembers the intent and re-applies the flag in `locationManagerDidChangeAuthorization`. |
+| With `AVAudioPlayer`, nothing renders between clips, so iOS would suspend the backgrounded app during a quiet spell even while "LIVE · LISTENING" | **Fixed** — a silent 1 s clip loops at volume 0 while the scanner is on and idle; stopped on pause (see DECISIONS.md). |
+| Two polling loops (`now` ticker, level meter) would never exit if their owner were deallocated | **Fixed** — `guard let self else { return }`. |
+| `convertFromSnakeCase` also rewrites `[String: T]` dictionary keys, so a place name containing `_` would never match its "N alerts this week" count | **Fixed** — per-place stats are now a list of `{name, count}`; unit names can never contain `_`. |
+| `MKMapItem(placemark:)` / `item.placemark` are deprecated in the iOS 18 SDK Xcode 16 builds against | **Left as is** — warnings only; the replacements are iOS 18-only and the deployment target is 17.0. |
+
+This is still not a build: compilation against a real toolchain has to happen
+in Xcode on your side.
 
 ## Your next steps
 
@@ -127,8 +144,6 @@ _In progress: a second, independent read-through of every Swift file for iOS 17 
    tests and walk the iOS checklist above on the phone.
 5. Tune `lincoln_vocab.txt` and `cities/lincoln.json → extract_hints` as you
    hear real traffic; switch to `GEOCODER=mapbox` if intersections miss.
-
-## Every decision (verbatim from `DECISIONS.md`)
 
 
 - **Replay clock reads use `spoken_time: "heard-840"` and a `{clock}` placeholder in the transcript** — a fixed "23:14" in the fixture would give a different (often >1 h, discarded) delay sample depending on when the replay runs; the relative form yields a deterministic ~14 min sample every run, which is what B5 needs to verify back-dating.
@@ -172,3 +187,5 @@ _In progress: a second, independent read-through of every Swift file for iOS 17 
 - **Near-me reports the phone's location at most every 5 min / 250 m from `CLLocationManager` significant-change updates** — enough for a 0.1–2 mi radius with little battery cost; the position is kept only in the device's rules blob.
 - **`DATA_DIR` is overridable by env** — `tests/acceptance.sh` runs the whole B5 server pass from a throw-away directory so a developer's `data/` is never touched; production keeps `./data` (`/opt/livewire/data`).
 - **`tests/acceptance.sh` is the written B5 checklist for the server** — it starts the API and the two stubs, replays the fixture while reading the stream, and prints PASS/FAIL per item; REPORT.md quotes its output rather than hand-ticked boxes.
+- **While the scanner is on and idle, `AudioEngine` loops a silent clip at volume 0** — with `AVAudioPlayer` nothing renders between transmissions, and iOS suspends a backgrounded app whose session is silent, which would stop the SSE feed and queueing after a quiet minute (B5 "lock the phone → audio continues"). The keep-alive stops when the scanner is paused.
+- **`POST /api/device` returns per-place alert counts as a list of `{name, count}`, not a dictionary** — the app's snake-case `JSONDecoder` also rewrites dictionary keys, so a place named with an underscore would never match; `normalize_unit` likewise turns `_` into a space so incident `units` keys stay safe.

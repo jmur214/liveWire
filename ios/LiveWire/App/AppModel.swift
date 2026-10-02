@@ -224,7 +224,8 @@ final class AppModel {
             tickTask = Task { [weak self] in
                 while !Task.isCancelled {
                     try? await Task.sleep(for: .seconds(1))
-                    self?.now = Date()
+                    guard let self else { return }
+                    self.now = Date()
                 }
             }
         }

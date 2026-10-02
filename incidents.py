@@ -35,7 +35,7 @@ _PUNCT = re.compile(r"[^\w\s]")
 
 def normalize_unit(u: str) -> str:
     """'Engine  1,' -> 'engine 1'."""
-    return _WS.sub(" ", _PUNCT.sub("", (u or "").lower())).strip()
+    return _WS.sub(" ", _PUNCT.sub("", (u or "").lower().replace("_", " "))).strip()
 
 
 _CLEAR = ("clear", "available", "back in service")

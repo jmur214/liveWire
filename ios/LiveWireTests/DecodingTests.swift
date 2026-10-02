@@ -84,11 +84,12 @@ final class DecodingTests: XCTestCase {
 
     func testDeviceResponseDecodes() throws {
         let r = try APIClient.decoder.decode(DeviceResponse.self, from: Data("""
-        {"ok": true, "stats": {"week_total": 4, "places": {"Home": 3}, "types": 1, "near_me": 0}}
+        {"ok": true, "stats": {"week_total": 4, "places": [{"name": "Mom_s house", "count": 3}], "types": 1, "near_me": 0}}
         """.utf8))
         XCTAssertTrue(r.ok)
         XCTAssertEqual(r.stats?.weekTotal, 4)
-        XCTAssertEqual(r.stats?.places["Home"], 3)
+        XCTAssertEqual(r.stats?.count(forPlace: "Mom_s house"), 3, "underscores in place names survive decoding")
+        XCTAssertEqual(r.stats?.count(forPlace: "Work"), 0)
         XCTAssertEqual(r.stats?.nearMe, 0)
     }
 
