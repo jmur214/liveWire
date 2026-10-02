@@ -152,17 +152,25 @@ def _synth_clip(text: str) -> np.ndarray:
 _HEARD_REL = re.compile(r"^heard([+-]\d+)$")
 
 
-def _replay_row(row: dict, heard_at: float, delays: DelayEstimator) -> int:
-    """Store one pre-extracted fixture row as if it had just come off the air."""
+def _prepare_row(row: dict, due: float) -> tuple[str, str | None, np.ndarray]:
+    """Resolve the transcript's clock placeholder and synthesise the clip ahead of
+    the row's due time, so storing it is instantaneous when the time comes."""
     text = row["transcript"]
     spoken = row.get("spoken_time")
     m = _HEARD_REL.match(spoken or "")
     if m:
         # "heard-840": the dispatcher read a clock 840 s before we heard it, so the
         # delay estimator gets a deterministic sample whenever the replay runs.
-        spoken = datetime.fromtimestamp(heard_at + int(m.group(1)), config.CITY_TZ).strftime("%H:%M")
+        spoken = datetime.fromtimestamp(due + int(m.group(1)), config.CITY_TZ).strftime("%H:%M")
     if "{clock}" in text:
         text = text.replace("{clock}", spoken or "")
+    return text, spoken, _synth_clip(text)
+
+
+def _replay_row(row: dict, heard_at: float, delays: DelayEstimator,
+                prepared: tuple[str, str | None, np.ndarray] | None = None) -> int:
+    """Store one pre-extracted fixture row as if it had just come off the air."""
+    text, spoken, audio = prepared or _prepare_row(row, heard_at)
     inc = Incident(
         agency=row.get("agency") or "unknown",
         incident_type=row.get("incident_type"),
@@ -174,7 +182,6 @@ def _replay_row(row: dict, heard_at: float, delays: DelayEstimator) -> int:
         summary=row.get("summary"),
         confidence=float(row.get("confidence") or 0.0),
     )
-    audio = _synth_clip(text)
     lat, lon = row.get("lat"), row.get("lon")
     if lat is None or lon is None:
         lat = lon = None
@@ -193,13 +200,18 @@ def replay(path: str, speed: float, loop: bool, delays: DelayEstimator) -> None:
         t0 = time.time()
         for row in rows:
             due = t0 + row["offset_sec"] / speed
+            try:
+                prepared = _prepare_row(row, due)
+            except Exception:
+                log.exception("failed preparing row at offset %s", row.get("offset_sec"))
+                continue
             while True:
                 wait = due - time.time()
                 if wait <= 0:
                     break
                 time.sleep(min(wait, 1.0))
             try:
-                _replay_row(row, time.time(), delays)
+                _replay_row(row, time.time(), delays, prepared)
             except Exception:
                 log.exception("failed replaying row at offset %s", row.get("offset_sec"))
             n += 1

@@ -17,3 +17,4 @@ One line per call made where `DESIGN.md` was ambiguous or did not survive contac
 - **Incident `address` = geocode query minus the city/state suffix** — e.g. "1621 N 33rd St, Lincoln, NE" → "1621 N 33rd St"; `heard_as` keeps the literal phrase.
 - **Incidents and alert records are pruned after 7 days** (transmissions after 24 h as before) — nothing in Part A looks back further than 48 h.
 - **Replay scales the 30 min idle rule by `--speed`** — B5 asks for clearing after 30 *simulated* minutes, so at `--speed 20` an incident clears after 90 real seconds.
+- **`/api/stream` polls SQLite every 0.5 s rather than receiving pushes from ingest** — ingest and API are separate systemd services (B2.8), so the database is the only shared channel; 0.5 s comfortably meets B5's "within 1 s" and costs two indexed queries per poll per client. `?since_id=` lets a reconnecting client replay transmissions it missed.

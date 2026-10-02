@@ -16,7 +16,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -217,6 +217,70 @@ def report(body: ReportBody):
         raise HTTPException(404, "incident not found")
     log.info("incident #%d reported: %s", body.incident_id, body.reason)
     return {"ok": True}
+
+
+# --- SSE -----------------------------------------------------------------------------------
+
+STREAM_POLL_SEC = 0.5
+STREAM_PING_SEC = 15.0
+
+
+def _sse(event: str, data: Any) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, separators=(',', ':'))}\n\n"
+
+
+def _poll_changes(last_tx_id: int, last_inc_ts: float, sent: dict[int, float]):
+    """One poll of the database (runs in a worker thread)."""
+    txs = db.transmissions_since(last_tx_id, 500)
+    incs = [i for i in db.incidents_updated_since(last_inc_ts - 0.001) if sent.get(i["id"]) != i["updated_at"]]
+    meta = db.incident_location_meta([i["id"] for i in incs]) if incs else {}
+    delay = _police_delay() if incs else 0.0
+    return txs, incs, meta, delay
+
+
+@app.get("/api/stream")
+async def stream(request: Request, since_id: int | None = Query(None, ge=0)):
+    """text/event-stream of `transmission`, `incident` and `ping` events.
+
+    Ingest runs in another process, so this polls SQLite twice a second: new
+    transmission ids and incidents whose `updated_at` moved (create, update,
+    cleared). `since_id` replays transmissions missed while disconnected."""
+
+    async def gen():
+        last_tx_id = since_id if since_id is not None else await asyncio.to_thread(db.latest_transmission_id)
+        last_inc_ts = time.time()
+        sent: dict[int, float] = {}
+        last_ping = time.time()
+        yield ": connected\n\n"
+        while True:
+            if await request.is_disconnected():
+                return
+            try:
+                txs, incs, meta, delay = await asyncio.to_thread(_poll_changes, last_tx_id, last_inc_ts, sent)
+            except Exception:
+                log.exception("stream poll failed")
+                txs, incs, meta, delay = [], [], {}, 0.0
+            for inc in incs:
+                sent[inc["id"]] = inc["updated_at"]
+                last_inc_ts = max(last_inc_ts, inc["updated_at"])
+                yield _sse("incident", incident_json(inc, meta, delay if inc.get("agency") in config.AGENCIES and config.AGENCIES[inc["agency"]].get("delayed") else 0.0))
+            for tx in txs:
+                last_tx_id = max(last_tx_id, tx["id"])
+                yield _sse("transmission", transmission_json(tx))
+            if len(sent) > 2000:
+                for k in list(sent)[:1000]:
+                    sent.pop(k, None)
+            now = time.time()
+            if now - last_ping >= STREAM_PING_SEC:
+                last_ping = now
+                yield _sse("ping", {})
+            await asyncio.sleep(STREAM_POLL_SEC)
+
+    return StreamingResponse(
+        gen(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no", "Connection": "keep-alive"},
+    )
 
 
 # --- legacy endpoints used by static/index.html --------------------------------------------
