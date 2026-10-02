@@ -82,6 +82,16 @@ final class DecodingTests: XCTestCase {
         XCTAssertEqual(c.cities[0].agencyName(.fire), "Fire")
     }
 
+    func testDeviceResponseDecodes() throws {
+        let r = try APIClient.decoder.decode(DeviceResponse.self, from: Data("""
+        {"ok": true, "stats": {"week_total": 4, "places": {"Home": 3}, "types": 1, "near_me": 0}}
+        """.utf8))
+        XCTAssertTrue(r.ok)
+        XCTAssertEqual(r.stats?.weekTotal, 4)
+        XCTAssertEqual(r.stats?.places["Home"], 3)
+        XCTAssertEqual(r.stats?.nearMe, 0)
+    }
+
     func testDeviceRegistrationEncodesSnakeCase() throws {
         var rules = AlertRules()
         rules.enabled = true

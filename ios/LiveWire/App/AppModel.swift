@@ -111,6 +111,7 @@ final class AppModel {
     let settings: Settings
     let location = LocationService()
     let audio: AudioEngine
+    let push: PushRegistrar
 
     private(set) var store = FeedStore()
     var city: City?
@@ -149,6 +150,7 @@ final class AppModel {
     init(settings: Settings) {
         self.settings = settings
         audio = AudioEngine(settings: settings)
+        push = PushRegistrar(settings: settings)
         cameraPosition = .region(MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 40.8136, longitude: -96.7026), span: Self.defaultSpan))
     }
@@ -200,6 +202,16 @@ final class AppModel {
 
     func start() {
         location.requestWhenInUse()
+        location.onUpdate = { [weak self] loc in
+            Task { @MainActor in self?.push.reportLocation(loc) }
+        }
+        if settings.alertRules.nearMe.enabled {
+            location.setBackgroundUpdates(true)
+        }
+        push.registerIfNeeded()
+        AppDelegate.onOpenIncident = { [weak self] id in
+            Task { @MainActor in self?.openDetail(id) }
+        }
         if !didResumeAudio {
             didResumeAudio = true
             // No autoplay on cold launch unless we were playing when backgrounded/killed
@@ -225,6 +237,7 @@ final class AppModel {
         stream?.stop()
         stream = nil
         audio.configure(api: settings.apiClient)
+        push.configure(api: settings.apiClient)
         guard let api = settings.apiClient else {
             connection = .offline("Invalid server URL")
             return
@@ -368,6 +381,20 @@ final class AppModel {
 
     func dismissBanner() {
         dismissedBannerId = bannerIncident?.id
+    }
+
+    /// "Near me now" needs Always location + background updates (A2.6).
+    func setNearMe(_ on: Bool) {
+        settings.alertRules.nearMe.enabled = on
+        if on {
+            location.requestAlways()
+            location.setBackgroundUpdates(true)
+            if let loc = location.location { push.reportLocation(loc) }
+        } else {
+            location.setBackgroundUpdates(false)
+            settings.alertRules.lastLocation = nil
+        }
+        push.sync()
     }
 
     func markFeedSeen() {

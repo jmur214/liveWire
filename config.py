@@ -97,6 +97,14 @@ API_TOKEN_IS_DEFAULT = not API_TOKEN
 if API_TOKEN_IS_DEFAULT:
     API_TOKEN = "dev-token"
 
+# --- Push notifications (APNs token auth; DESIGN.md B2.6) -------------------
+APNS_KEY_PATH = os.environ.get("APNS_KEY_PATH", "")
+APNS_KEY_ID = os.environ.get("APNS_KEY_ID", "")
+APNS_TEAM_ID = os.environ.get("APNS_TEAM_ID", "")
+APNS_BUNDLE_ID = os.environ.get("APNS_BUNDLE_ID", "")
+APNS_SANDBOX = os.environ.get("APNS_SANDBOX", "true").lower() in ("1", "true", "yes")
+APNS_URL_OVERRIDE = os.environ.get("APNS_URL_OVERRIDE", "")   # tests only: point at a stub
+
 # --- Storage / web ----------------------------------------------------------
 DB_PATH = DATA_DIR / "events.sqlite"
 AUDIO_DIR = DATA_DIR / "audio"        # per-transmission clips, for playback on the map

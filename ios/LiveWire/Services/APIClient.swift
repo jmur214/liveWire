@@ -142,8 +142,8 @@ struct APIClient: Sendable {
         _ = try await post(OKResponse.self, "/api/report", body: ReportBody(incidentId: incidentId, reason: reason))
     }
 
-    func registerDevice(_ reg: DeviceRegistration) async throws {
-        _ = try await post(OKResponse.self, "/api/device", body: reg)
+    func registerDevice(_ reg: DeviceRegistration) async throws -> DeviceResponse {
+        try await post(DeviceResponse.self, "/api/device", body: reg)
     }
 
     func streamRequest(sinceId: Int?) -> URLRequest {

@@ -27,6 +27,7 @@ import numpy as np
 import config
 import db
 import incidents
+import push
 from delay import DelayEstimator
 from extract import Incident, extract
 from geocode import geocode
@@ -257,6 +258,7 @@ def main() -> None:
     db.init()
     delays = DelayEstimator()
     _start_heartbeat(delays)
+    incidents.on_created.append(push.on_incident_created)   # alerts fire on incident creation only
 
     if args.replay:
         if args.speed <= 0:

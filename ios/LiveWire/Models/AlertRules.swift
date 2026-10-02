@@ -53,6 +53,19 @@ struct DeviceRegistration: Codable {
     var rules: AlertRules
 }
 
+/// Alerts delivered in the last 7 days, from the POST /api/device response.
+struct AlertStats: Codable, Equatable {
+    var weekTotal: Int
+    var places: [String: Int]
+    var types: Int
+    var nearMe: Int
+}
+
+struct DeviceResponse: Codable {
+    var ok: Bool
+    var stats: AlertStats?
+}
+
 struct ReportBody: Codable {
     var incidentId: Int
     var reason: String

@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import UserNotifications
 
 @main
 struct LiveWireApp: App {
@@ -28,10 +29,34 @@ struct RootView: View {
     }
 }
 
-/// UIKit delegate: only needed for the APNs device token (PushRegistrar picks it up).
-final class AppDelegate: NSObject, UIApplicationDelegate {
+/// UIKit delegate: APNs device token (PushRegistrar picks it up) and notification taps.
+final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     static var onPushToken: ((String) -> Void)?
     static var onPushTokenError: ((Error) -> Void)?
+    static var onOpenIncident: ((Int) -> Void)?
+
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        UNUserNotificationCenter.current().delegate = self
+        return true
+    }
+
+    /// Show alert pushes as banners even while the app is in the foreground.
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.banner, .sound])
+    }
+
+    /// Tapping a push opens that incident's Detail.
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        let info = response.notification.request.content.userInfo
+        if let id = (info["incident_id"] as? Int) ?? (info["incident_id"] as? NSNumber)?.intValue
+            ?? Int((info["incident_id"] as? String) ?? "") {
+            AppDelegate.onOpenIncident?(id)
+        }
+        completionHandler()
+    }
 
     func application(_ application: UIApplication,
                      didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {

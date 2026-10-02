@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
 import secrets
 import time
 from typing import Any
@@ -217,6 +218,37 @@ def report(body: ReportBody):
         raise HTTPException(404, "incident not found")
     log.info("incident #%d reported: %s", body.incident_id, body.reason)
     return {"ok": True}
+
+
+# --- devices (alerts) ----------------------------------------------------------------------
+
+class DeviceBody(BaseModel):
+    token: str = Field(min_length=16, max_length=400)
+    city: str = "lincoln"
+    sandbox: bool = True
+    rules: dict[str, Any] = Field(default_factory=dict)
+
+
+_HEX = re.compile(r"^[0-9a-f]{16,}$")
+
+
+@app.post("/api/device")
+def device(body: DeviceBody):
+    """Register / update a device's APNs token and alert rules (B3). The rules blob
+    also carries `sandbox` (dev build → APNs sandbox) and `last_location`."""
+    token = body.token.strip().lower()
+    if not _HEX.match(token):
+        raise HTTPException(400, "token must be the APNs device token as hex")
+    if body.city not in {c["id"] for c in config.all_cities()}:
+        raise HTTPException(400, f"unknown city {body.city!r}")
+    rules = dict(body.rules)
+    rules["sandbox"] = body.sandbox
+    prev = db.device(token)
+    if prev and not rules.get("last_location") and prev["rules"].get("last_location"):
+        rules["last_location"] = prev["rules"]["last_location"]   # a rules-only update keeps the last fix
+    db.upsert_device(token, body.city, rules)
+    log.info("device %s… registered (%s, enabled=%s)", token[:8], body.city, bool(rules.get("enabled")))
+    return {"ok": True, "stats": db.alert_stats(token)}
 
 
 # --- SSE -----------------------------------------------------------------------------------

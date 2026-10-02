@@ -56,7 +56,8 @@ CREATE TABLE IF NOT EXISTS devices (
     updated_at REAL NOT NULL
 );
 CREATE TABLE IF NOT EXISTS alerts_sent (
-    id INTEGER PRIMARY KEY, token TEXT, incident_id INTEGER, sent_at REAL
+    id INTEGER PRIMARY KEY, token TEXT, incident_id INTEGER, sent_at REAL,
+    reason TEXT                                 -- "type:<t>" | "place:<name>" | "near_me"
 );
 CREATE INDEX IF NOT EXISTS ix_alerts_tok_inc ON alerts_sent(token, incident_id);
 
@@ -69,6 +70,7 @@ MIGRATIONS = [
     "ALTER TABLE transmissions ADD COLUMN city TEXT NOT NULL DEFAULT 'lincoln'",
     "ALTER TABLE transmissions ADD COLUMN location_kind TEXT",
     "ALTER TABLE incidents ADD COLUMN updated_at REAL NOT NULL DEFAULT 0",
+    "ALTER TABLE alerts_sent ADD COLUMN reason TEXT",
     "CREATE INDEX IF NOT EXISTS ix_tx_inc ON transmissions(incident_id)",
 ]
 
@@ -295,20 +297,35 @@ def alert_already_sent(token: str, incident_id: int) -> bool:
     return r is not None
 
 
-def record_alert(token: str, incident_id: int) -> None:
+def record_alert(token: str, incident_id: int, reason: str | None = None) -> None:
     with connect() as con:
         con.execute(
-            "INSERT INTO alerts_sent (token, incident_id, sent_at) VALUES (?,?,?)",
-            (token, incident_id, time.time()),
+            "INSERT INTO alerts_sent (token, incident_id, sent_at, reason) VALUES (?,?,?,?)",
+            (token, incident_id, time.time(), reason),
         )
 
 
-def alerts_this_week(token: str) -> int:
+def delete_device(token: str) -> None:
     with connect() as con:
-        r = con.execute(
-            "SELECT COUNT(*) FROM alerts_sent WHERE token=? AND sent_at >= ?", (token, time.time() - 7 * 86400)
-        ).fetchone()
-    return int(r[0] or 0)
+        con.execute("DELETE FROM devices WHERE token=?", (token,))
+
+
+def alert_stats(token: str) -> dict:
+    """Alerts in the last 7 days for the Alerts screen: total, per place, by type, near-me."""
+    since = time.time() - 7 * 86400
+    stats: dict = {"week_total": 0, "places": {}, "types": 0, "near_me": 0}
+    with connect() as con:
+        for r in con.execute("SELECT reason, COUNT(*) n FROM alerts_sent WHERE token=? AND sent_at >= ? GROUP BY reason",
+                             (token, since)):
+            reason, n = r["reason"] or "", int(r["n"])
+            stats["week_total"] += n
+            if reason.startswith("place:"):
+                stats["places"][reason[6:]] = stats["places"].get(reason[6:], 0) + n
+            elif reason.startswith("type:"):
+                stats["types"] += n
+            elif reason == "near_me":
+                stats["near_me"] += n
+    return stats
 
 
 # --- housekeeping ------------------------------------------------------------------------
