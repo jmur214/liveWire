@@ -9,8 +9,8 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).parent
-DATA_DIR = ROOT / "data"
-DATA_DIR.mkdir(exist_ok=True)
+DATA_DIR = Path(os.environ.get("DATA_DIR", ROOT / "data"))   # override for tests / alternate installs
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 VERSION = "1.0.0"
 
 # --- City -------------------------------------------------------------------
